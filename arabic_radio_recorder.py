@@ -101,6 +101,9 @@ def extract_direct_stream_url(play_page_url):
         logger.error(f"Error extracting direct stream URL from {play_page_url}: {e}")
         return None
 
+country_code = input("Enter country code: ")
+city_name = input("Enter city name: ")
+
 def record_stream(url: str, seconds: int = 30, folder: str = "recordings") -> pathlib.Path:
     """
     Record a stream for the specified number of seconds using FFmpeg.
@@ -109,7 +112,17 @@ def record_stream(url: str, seconds: int = 30, folder: str = "recordings") -> pa
     """
     os.makedirs(folder, exist_ok=True) # this function helps to create direc >> folder
     ts = datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%S") # reocrd time 
-    out_file = pathlib.Path(folder) / f"radio_{ts}.mp3"
+     if country_code:
+        out_folder = pathlib.Path(folder) / country_code
+        out_file = out_folder / f"{country_code}_{ts}.mp3"
+    elif city_name:
+        out_folder = pathlib.Path(folder) / city_name
+        out_file = out_folder / f"{city_name}_{ts}.mp3"
+    else:
+        out_folder = pathlib.Path(folder)
+        out_file = out_folder / f"radio.{ts}.mp3"
+
+    os.makedirs(out_folder, exist_ok=True)
 
     # If it's an HTML page, extract the actual streaming URL first
     parsed = urlparse(url)
